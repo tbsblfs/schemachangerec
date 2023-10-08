@@ -1,0 +1,19 @@
+[package]
+name = "rust-dist"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "rust_dist"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = "0.18.3"
+ndarray = "0.15.3"
+numpy = "0.18.0"
+ndarray-linalg = "0.16.0"
+ordered-float = "3.7.0"
+rayon = "1.5.0"
+indicatif = { version = "0.17.3", features = ["rayon"] }
+chrono = "0.4.19"
