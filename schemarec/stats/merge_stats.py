@@ -3,7 +3,7 @@ import fileinput
 import json
 from collections import Counter
 
-from analysis.util.util import SetEncoder
+from schemarec.util import SetEncoder
 from jsonlines import jsonlines
 from tqdm import tqdm
 

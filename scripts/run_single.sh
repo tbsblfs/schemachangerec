@@ -16,10 +16,9 @@ projection=$3
 if [ -z "$projection" ]; then
     projection="exclude"
 fi
-parent_folder=$(dirname "$folder")
 
 embeddings="data/embeddings/enwiki_20180420_300d_entities.txt"
-export TMPDIR=/home/tobias.bleifuss/python/schemachangerules/tmp
+export TMPDIR=./tmp
 
 
 build_graph() {
@@ -111,7 +110,7 @@ for strategy in "baseline" "lattice"; do
         python3 -m schemarec.mining.build_rule_df \
             --nodes "$folder/$strategy-nodes.json" \
             --edges "$folder/$strategy-edges.json" \
-            --users "$parent_folder/stats.json" \
+            --users "$folder/stats.json" \
             --output "$folder/rules-$strategy.pickle"
         rules_end=$(date +%s)
         echo "Rule building,$strategy,$((rules_end - rules_start))" >>"$folder/times.txt"
@@ -128,18 +127,15 @@ for strategy in "baseline" "lattice"; do
         echo "Overlap $split,$strategy,$((overlap_end - overlap_start))" >>"$folder/times.txt"
     done
 
-
-    for learner in "lgbm" "flaml"; do
-        if [ -f "$folder/ranking-$strategy-$learner-agg.json" ] && [ "$redo" != "ranking" ]&& [ "$redo" != "all" ]; then
-            echo "Ranking already exists, skipping"
-            continue
-        fi
-        echo "Learn ranking for $strategy with $learner"
-        learn_start=$(date +%s)
-        learn "$strategy" "$learner"
-        learn_end=$(date +%s)
-        echo "Learning $learner,$strategy,$((learn_end - learn_start))" >>"$folder/times.txt"
-    done
+    if [ -f "$folder/ranking-$strategy-lgbm-agg.json" ] && [ "$redo" != "ranking" ]&& [ "$redo" != "all" ]; then
+        echo "Ranking already exists, skipping"
+        continue
+    fi
+    echo "Learn ranking for $strategy with lgbm"
+    learn_start=$(date +%s)
+    learn "$strategy" "lgbm"
+    learn_end=$(date +%s)
+    echo "Learning lgbm,$strategy,$((learn_end - learn_start))" >>"$folder/times.txt"
 
 
 done

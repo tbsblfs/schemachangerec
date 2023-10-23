@@ -6,8 +6,9 @@ from collections import Counter
 from pathlib import Path
 
 import tqdm as tqdm
-from analysis.schemamatching import Table, create_correspondences, create_config
-from analysis.util.util import SetEncoder
+from schemarec.schemamatching import create_correspondences, create_config
+from schemarec.table import Table
+from schemarec.util import SetEncoder
 from jsonlines import jsonlines
 
 

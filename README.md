@@ -14,6 +14,8 @@ Packages:
 ### Requirements
 - Python 3.9
 - Rust 1.72.0
+- Jq 1.6
+- Optional: GNU parallel
 
 ### Create a virtual env and install dependencies
 
@@ -32,18 +34,31 @@ maturin develop --release
 
 ### Download table data and extract schema changes
 
-Download from our project page. Extract using:
+Download table changes from our project page. Extract schema changes using:
 
 ```bash
 python -m extraction.extract_schema_changes --help
 ```
 
-### Run pipeline
+Or directly download extracted schema changes from our project page and unzip them to `data/schemamatch.
+
+### Run train/test split
 
 ```bash
-./scripts/run_single.sh
+./scripts/create_splits.sh
 ```
 
+This should create three folders: `data/splits/temporal`, `data/splits/spatial`and `data/splits/spatiotemporal`.
+
+### Run pipeline
+
+Download the embeddings file (300d txt) from [Wikipedia2Vec](https://wikipedia2vec.github.io/wikipedia2vec/pretrained/) and unzip it.
+
+Place the embeddings file `enwiki_20180420_300d_entities.txt` to `data/embeddings` and run the pipeline:
+
+```bash
+./scripts/run_all.sh
+```
 
 ## Development
 

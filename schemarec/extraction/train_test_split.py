@@ -28,10 +28,6 @@ def temporal_key_accept(keys, start_date):
     return lambda version: a1(version) and a2(version)
 
 
-def random_accept(probability):
-    return lambda version: random.random() < probability
-
-
 class Split:
     def __init__(self, path, name, name_prefix, criterion, exclusive=True):
         self.name = name
@@ -83,32 +79,27 @@ def main():
     first_split = 'train_ranking' if args.graphranking else 'test'
     second_split = 'train_graph' if args.graphranking else 'train'
 
-    split_groups = [
-        [
+    split_groups = []
+    if not args.graphranking:
+        split_groups.append([
             Split(path, 'temporal/' + first_split, name_prefix, temporal_accept(start_date)),
             Split(path, 'temporal/' + second_split, name_prefix, None),
-        ]
-    ]
+        ])
     if args.keys is not None:
         keys = set()
         with open(args.keys) as f:
             for line in f:
                 keys.add(line.strip())
 
-        split_groups.append([
-            Split(path, 'spatial/' + first_split, name_prefix, key_accept(keys)),
-            Split(path, 'spatial/' + second_split, name_prefix, None),
-        ])
+        if not args.graphranking:
+            split_groups.append([
+                Split(path, 'spatial/' + first_split, name_prefix, key_accept(keys)),
+                Split(path, 'spatial/' + second_split, name_prefix, None),
+            ])
 
         split_groups.append([
-            Split(path, 'tempospatial/' + first_split, name_prefix, temporal_key_accept(keys, start_date)),
-            Split(path, 'tempospatial/' + second_split, name_prefix, None),
-        ])
-
-    if args.graphranking:
-        split_groups.append([
-            Split(path, 'random/' + first_split, name_prefix, random_accept(args.randomrate)),
-            Split(path, 'random/' + second_split, name_prefix, None),
+            Split(path, 'spatiotemporal/' + first_split, name_prefix, temporal_key_accept(keys, start_date)),
+            Split(path, 'spatiotemporal/' + second_split, name_prefix, None),
         ])
 
     with ExitStack() as stack:
